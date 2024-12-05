@@ -161,4 +161,4 @@ MF-6. Адміністрування системи
 5.	DBeaver Database Management Tool. URL: https://dbeaver.io/ (дата звернення: 17.11.2024);
 6.	Postman API Testing Tool. URL: https://www.postman.com/ (дата звернення: 17.11.2024).
 Посилання на git-репозиторій: https://github.com/NureKalenykVira/arkpz-pzpi-22-6-kalenyk-vira/tree/main/Task1.
-Посилання на відео-доповідь:  .
+Посилання на відео-доповідь:  https://youtu.be/TqSFCEamSzE.
