@@ -234,7 +234,7 @@
 6.	Eclipse: [вебсайт]. — Режим доступу: https://www.eclipse.org (дата звернення: 02.12..2024).
 1.6	 Посилання
 Посилання на GitHub репозиторій: https://github.com/NureKalenykVira/arkpz-pzpi-22-6-kalenyk-vira/tree/main/Pract2
-Посилання на відео доповіді: 
+Посилання на відео доповіді: https://youtu.be/lzWilnfWQto
 
  
 Додаток А
