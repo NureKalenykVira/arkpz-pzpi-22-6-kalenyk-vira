@@ -1,5 +1,5 @@
 const axios = require('axios');
-const API_URL = process.env.API_URL || 'http://localhost:3000'; // Використання змінної середовища API_URL
+const API_URL = process.env.API_URL || 'https://server-f0rb.onrender.com'; // Використання змінної середовища API_URL
 
 async function loadThresholds() {
     try {
