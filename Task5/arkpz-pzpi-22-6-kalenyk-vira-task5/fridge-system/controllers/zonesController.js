@@ -14,7 +14,6 @@ const getZones = async (req, res) => {
         INNER JOIN Refrigerators r ON z.RefrigeratorID = r.RefrigeratorID
     `);
     console.log('Zones fetched:', zones);
-    ...
 } catch (error) {
     console.error('Error fetching zones:', error.message);
     res.status(500).json({ message: 'Error fetching zones.', error: error.message });
