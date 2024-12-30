@@ -1,4 +1,5 @@
 const axios = require('axios');
+require('dotenv').config();
 const API_URL = process.env.API_URL || 'https://server-f0rb.onrender.com';
 
 (async () => {
