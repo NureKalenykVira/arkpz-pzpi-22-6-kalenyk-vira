@@ -1,5 +1,5 @@
 const axios = require('axios');
-const API_URL = process.env.API_URL || 'http://localhost:3000';
+const API_URL = process.env.API_URL || 'https://server-f0rb.onrender.com';
 
 (async () => {
     try {
@@ -57,7 +57,7 @@ async function sendSensorData() {
     try {
         // Отримання актуальних порогових значень
         console.log('Fetching thresholds from server...');
-        currentThresholds = await axios.get('http://localhost:3000/settings/thresholds');
+        currentThresholds = await axios.get('https://server-f0rb.onrender.com/settings/thresholds');
         currentThresholds = currentThresholds.data; // Зберігаємо отримані значення
         console.log('Fetched thresholds:', currentThresholds);
     } catch (error) {
@@ -83,7 +83,7 @@ async function sendSensorData() {
 
                 // Надсилання аномалій на сервер
                 try {
-                    await axios.post('http://localhost:3000/sensors/anomalies', {
+                    await axios.post('https://server-f0rb.onrender.com/sensors/anomalies', {
                         refrigeratorId: data.refrigeratorId,
                         zoneId: data.zoneId,
                         anomalies,
@@ -97,7 +97,7 @@ async function sendSensorData() {
             }
 
             // Надсилання основних даних
-            await axios.post('http://localhost:3000/sensors/data', data, {
+            await axios.post('https://server-f0rb.onrender.com/sensors/data', data, {
                 headers: { 'Content-Type': 'application/json' },
             });
             console.log(`Data sent for Refrigerator ${data.refrigeratorName}, Zone ${data.zoneName}:`, data);
