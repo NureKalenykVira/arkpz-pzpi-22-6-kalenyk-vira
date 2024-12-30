@@ -1,12 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
 const API_URL = process.env.API_URL || 'https://server-f0rb.onrender.com';
-const port = process.env.PORT || 3000;
-app.use(express.json());
-
-app.listen(port, '0.0.0.0', () => {
-  console.log(`IOT is running on http://localhost:${port}`);
-});
 
 (async () => {
     try {
