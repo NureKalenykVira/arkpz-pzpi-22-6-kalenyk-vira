@@ -81,5 +81,5 @@
 6.	Render. Офіційна документація для розгортання додатків та фонових процесів на Render [Електронний ресурс]. – Режим доступу: https://render.com/docs – Дата доступу: 19.12.2024.
 
 1.5	 Посилання
-Посилання на репозиторій git hub: https://github.com/NureKalenykVira/arkpz-pzpi-22-6-kalenyk-vira/tree/main/Task4.
+Посилання на репозиторій git hub: https://github.com/NureKalenykVira/arkpz-pzpi-22-6-kalenyk-vira/tree/main/Task5.
 Посилання на відео-доповідь: https://youtu.be/xIdxTwY_Frk.
