@@ -26,7 +26,9 @@ app.use(cors({
     'https://fridge-web.onrender.com',
     'http://localhost:4200'
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Authorization', 'Content-Type']
 }));
 
 app.use(express.json());
