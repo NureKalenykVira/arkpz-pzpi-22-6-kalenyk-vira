@@ -6,10 +6,7 @@ console.log('DB_PORT:', process.env.DB_PORT);
 
 const express = require('express');
 const cors = require('cors');
-<<<<<<< HEAD
-=======
 
->>>>>>> 9b1dea73742431cfefd8e80e02ae96406853408a
 const userRoutes = require('./routes/userRoutes');
 const refrigeratorRoutes = require('./routes/refrigeratorRoutes');
 const sensorRoutes = require('./routes/sensorRoutes');
@@ -19,9 +16,9 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-const app = express(); // <-- Ось тут створюєш app
+const app = express();
 
-app.use(cors({
+const corsOptions = {
   origin: [
     'https://fridge-web.onrender.com',
     'http://localhost:4200'
@@ -29,17 +26,13 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Authorization', 'Content-Type']
-}));
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Додаємо це для preflight!
 
 app.use(express.json());
-app.use(cors({
-  origin: [
-    'https://fridge-web.onrender.com',
-    'http://localhost:4200'
-  ],
-  credentials: true
-}));
 
+// Підключення роутів
 app.use('/users', userRoutes);
 app.use('/refrigerators', refrigeratorRoutes);
 app.use('/sensors', sensorRoutes);
@@ -52,7 +45,7 @@ app.use('/admin', adminRoutes);
 app.use((req, res, next) => {
   console.log(`Request received: ${req.method} ${req.url}`);
   next();
-}); 
+});
 
 // Видалення протермінованих токенів
 const clearExpiredTokens = async () => {
