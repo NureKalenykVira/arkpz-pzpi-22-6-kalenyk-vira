@@ -7,6 +7,14 @@ console.log('DB_PORT:', process.env.DB_PORT);
 const express = require('express');
 const cors = require('cors');
 
+const app = express();
+
+app.use(cors({
+  origin: '*'
+}));
+
+app.use(express.json());
+
 const userRoutes = require('./routes/userRoutes');
 const refrigeratorRoutes = require('./routes/refrigeratorRoutes');
 const sensorRoutes = require('./routes/sensorRoutes');
@@ -16,10 +24,6 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-const app = express();
-app.use(express.json());
-
-// Підключення роутів
 app.use('/users', userRoutes);
 app.use('/refrigerators', refrigeratorRoutes);
 app.use('/sensors', sensorRoutes);
@@ -34,7 +38,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Видалення протермінованих токенів
 const clearExpiredTokens = async () => {
   try {
       await db.query('DELETE FROM UserTokens WHERE Expiration < NOW()');
@@ -44,7 +47,6 @@ const clearExpiredTokens = async () => {
   }
 };
 
-// Викликати кожну годину
 setInterval(clearExpiredTokens, 3600000);
 
 const PORT = 3000;
