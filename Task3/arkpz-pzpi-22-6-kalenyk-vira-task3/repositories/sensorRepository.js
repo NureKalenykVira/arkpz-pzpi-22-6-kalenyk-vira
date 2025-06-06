@@ -18,21 +18,33 @@ const addSensor = async (refrigeratorId, type, status) => {
     'INSERT INTO Sensors (RefrigeratorID, Type, Status) VALUES (?, ?, ?)',
     [refrigeratorId, type, status]
   );
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [userId, 'CREATE_SENSOR', `Додано сенсор типу ${type} в холодильник з ID ${refrigeratorId}. Статус: ${status}`]
+  );
   return result;
 };
 
 // Оновити датчик
-const updateSensor = async (id, type, status) => {
+const updateSensor = async (id, type, status, adminId) => {
   const [result] = await db.query(
     'UPDATE Sensors SET Type = ?, Status = ?, UpdatedAt = CURRENT_TIMESTAMP WHERE SensorID = ?',
     [type, status, id]
+  );
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [adminId, 'UPDATE_SENSOR', `Сенсор з ID ${id} оновлено. Тип: ${type}, Статус: ${status}`]
   );
   return result;
 };
 
 // Видалити датчик
-const deleteSensor = async (id) => {
+const deleteSensor = async (id, adminId) => {
   const [result] = await db.query('DELETE FROM Sensors WHERE SensorID = ?', [id]);
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [adminId, 'DELETE_SENSOR', `Сенсор з ID ${id} видалено`]
+  );
   return result;
 };
 

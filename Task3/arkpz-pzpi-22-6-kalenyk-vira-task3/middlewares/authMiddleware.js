@@ -7,29 +7,33 @@ const db = require('../db');
 const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    console.log('🛠 Отримано запит з токеном:', req.headers['authorization']);
 
     if (!token) {
         return res.status(401).json({ message: 'Необхідна авторизація.' });
     }
 
     try {
-        // Перевірка токена через JWT
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+        console.log('>>> Отриманий з заголовка токен:', token);
 
-        // Перевірка токена в базі даних
-        const [rows] = await db.query(
-            'SELECT * FROM UserTokens WHERE Token = ? AND Expiration > NOW()',
-            [token]
-        );
+const decoded = jwt.verify(token, process.env.JWT_SECRET);
+console.log('>>> Розкодовка JWT:', decoded);
 
-        if (rows.length === 0) {
-            return res.status(403).json({ message: 'Токен недійсний або термін дії завершено.' });
-        }
+// Перевірка в БД (залишається без змін)
+const [rows] = await db.query('SELECT * FROM UserTokens WHERE Token = ? AND Expiration > NOW()', [token]);
+if (rows.length === 0) {
+  console.log('❌ Токен не знайдено або протермінований у БД:', token);
+  return res.status(403).json({ message: 'Токен недійсний або термін дії завершено.' });
+}
 
-        req.userId = decoded.userId; // Додаємо userId до req
-        req.userRole = decoded.role; // Додаємо роль до req
-        console.log('Роль, отримана з токена:', decoded.role);
-        next();
+// 🛠️ Ось ця частина — головне:
+req.user = {
+  userId: decoded.userId,
+  role: decoded.role
+};
+
+console.log('Роль, отримана з токена:', decoded.role);
+next();
     } catch (error) {
 
         console.error('Помилка авторизації:', error);

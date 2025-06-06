@@ -27,12 +27,20 @@ const updateSensorData = async (id, temperature, humidity, timestamp) => {
     'UPDATE SensorData SET Temperature = ?, Humidity = ?, Timestamp = ? WHERE DataID = ?',
     [temperature, humidity, timestamp, id]
   );
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [userId, 'UPDATE_SENSOR', `Дані сенсора з ID ${id} оновлено: Температура ${temperature}°C, Вологість ${humidity}%`]
+  );
   return result;
 };
 
 // Видалити дані за ID
 const deleteSensorData = async (id) => {
   const [result] = await db.query('DELETE FROM SensorData WHERE DataID = ?', [id]);
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [userId, 'DELETE_SENSOR', `Дані сенсора з ID ${id} видалено`]
+  );
   return result;
 };
 

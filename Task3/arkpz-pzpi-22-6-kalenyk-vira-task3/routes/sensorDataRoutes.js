@@ -5,13 +5,13 @@ const router = express.Router();
 const checkRole = require('../middlewares/checkRole');
 const authenticateToken = require('../middlewares/authMiddleware');
 
-router.get('/', authenticateToken, checkRole(['ProductAdmin', 'LogicAdmin']), sensorDataController.getSensorData);
-router.get('/:id', authenticateToken, checkRole(['ProductAdmin']), sensorDataController.getSensorDataById);
-router.post('/', authenticateToken, checkRole(['ProductAdmin']), sensorDataController.addSensorData);
-router.put('/:id', authenticateToken, checkRole(['ProductAdmin']), sensorDataController.updateSensorData);
-router.delete('/:id', authenticateToken, checkRole(['ProductAdmin']), sensorDataController.deleteSensorData);
-router.get('/sensor/:sensorId', authenticateToken, checkRole(['ProductAdmin']), sensorDataController.getSensorDataBySensor);
-router.get('/product/:productId', authenticateToken, checkRole(['ProductAdmin']), sensorDataController.getSensorDataByProduct);
-router.get('/date', authenticateToken, checkRole(['LogicAdmin']), sensorDataController.getSensorDataByDate);
+router.get('/', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.getSensorData);
+router.get('/:id', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.getSensorDataById);
+router.post('/', sensorDataController.addSensorData);
+router.put('/:id', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.updateSensorData);
+router.delete('/:id', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.deleteSensorData);
+router.get('/sensor/:sensorId', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.getSensorDataBySensor);
+router.get('/product/:productId', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.getSensorDataByProduct);
+router.get('/date', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorDataController.getSensorDataByDate);
 
 module.exports = router;

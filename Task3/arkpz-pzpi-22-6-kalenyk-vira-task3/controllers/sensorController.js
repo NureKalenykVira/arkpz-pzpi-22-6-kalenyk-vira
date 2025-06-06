@@ -5,7 +5,7 @@ const handleAnomalousData = require('../business-logic/handleAnomalousData');
 const getSensors = async (req, res) => {
   try {
     const sensors = await sensorRepository.getSensors();
-    await handleAnomalousData(sensorData);
+    // await handleAnomalousData(sensorData);
     res.status(200).json(sensors);
   } catch (error) {
     console.error('Error fetching sensors:', error.message);
@@ -31,8 +31,9 @@ const getSensorById = async (req, res) => {
 // Додати новий датчик
 const addSensor = async (req, res) => {
   const { refrigeratorId, type, status } = req.body;
+  const adminId = req.user?.userId;
   try {
-    const result = await sensorRepository.addSensor(refrigeratorId, type, status);
+    const result = await sensorRepository.addSensor(refrigeratorId, type, status, adminId);
     res.status(201).json({ sensorId: result.insertId });
   } catch (error) {
     console.error('Error adding sensor:', error.message);
@@ -44,8 +45,9 @@ const addSensor = async (req, res) => {
 const updateSensor = async (req, res) => {
   const { id } = req.params;
   const { type, status } = req.body;
+  const adminId = req.user?.userId;
   try {
-    const result = await sensorRepository.updateSensor(id, type, status);
+    const result = await sensorRepository.updateSensor(id, type, status, adminId);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Sensor not found' });
     }
@@ -59,8 +61,9 @@ const updateSensor = async (req, res) => {
 // Видалити датчик
 const deleteSensor = async (req, res) => {
   const { id } = req.params;
+  const adminId = req.user?.userId;
   try {
-    const result = await sensorRepository.deleteSensor(id);
+    const result = await sensorRepository.deleteSensor(id, adminId);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Sensor not found' });
     }

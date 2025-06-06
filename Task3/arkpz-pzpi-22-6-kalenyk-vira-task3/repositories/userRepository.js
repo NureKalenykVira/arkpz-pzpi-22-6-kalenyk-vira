@@ -15,13 +15,19 @@ async function getUserById(id) {
     return users[0];
   }
 
-async function updateUser(id, name, email, password, role) {
-    const [result] = await db.execute(
-      `UPDATE Users SET Name = ?, Email = ?, Password = ?, Role = ? WHERE UserID = ?`,
-      [name, email, password, role, id]
-    );
-    return result;
-  }
+async function updateUser(id, name, email, password, role, adminId) {
+  const [result] = await db.execute(
+    `UPDATE Users SET Name = ?, Email = ?, Password = ?, Role = ? WHERE UserID = ?`,
+    [name, email, password, role, id]
+  );
+
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [adminId, 'UPDATE_ROLE', `Користувача з ID ${id} оновлено. Нова роль: ${role}`]
+  );
+
+  return result;
+}
 
 async function addUser(name, email, password, role) {
     const [existingUser] = await db.execute(
@@ -38,13 +44,27 @@ async function addUser(name, email, password, role) {
       [name, email, password, role]
     );
   
+    await db.query(
+      'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+      [adminId, 'CREATE_USER', `Користувача ${name} з email ${email} та роллю ${role} створено`]
+    );
+
     return result;
   }
 
-async function deleteUser(id) {
-    const [result] = await db.execute(`DELETE FROM Users WHERE UserID = ?`, [id]);
-    return result;
-  }
+async function deleteUser(id, adminId) {
+  const [result] = await db.execute(
+    `DELETE FROM Users WHERE UserID = ?`,
+    [id]
+  );
+
+  await db.query(
+    'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+    [adminId, 'DELETE_USER', `Користувача з ID ${id} видалено`]
+  );
+
+  return result;
+}
 
   async function updateUserProfile(userId, name, email, password) {
     // Масиви для динамічних частин запиту

@@ -28,9 +28,16 @@ const getRefrigeratorById = async (req, res) => {
 
 // Додавання нового холодильника
 const addRefrigerator = async (req, res) => {
-  const { userId, name, location } = req.body;
+  const userId = req.body.userId ?? req.body.UserID;
+  const name = req.body.name ?? req.body.Name;
+  const location = req.body.location ?? req.body.Location;
+  // (Рекомендую додати базову перевірку)
+  if (!userId || !name || !location) {
+    return res.status(400).json({ error: 'UserID, Name і Location обов’язкові' });
+  }
   try {
     const result = await refrigeratorRepository.addRefrigerator(userId, name, location);
+    await logAdminAction(req.userId, 'CREATE_FRIDGE', `Fridge ${name} додано`);
     res.status(201).json({ refrigeratorId: result.insertId });
   } catch (error) {
     console.error('Error adding refrigerator:', error.message);
@@ -41,12 +48,18 @@ const addRefrigerator = async (req, res) => {
 // Оновлення холодильника
 const updateRefrigerator = async (req, res) => {
   const { id } = req.params;
-  const { userId, name, location } = req.body;
+  const userId = req.body.userId ?? req.body.UserID;
+  const name = req.body.name ?? req.body.Name;
+  const location = req.body.location ?? req.body.Location;
+  if (!name || !location) {
+    return res.status(400).json({ error: 'Name and location are required' });
+  }
   try {
     const result = await refrigeratorRepository.updateRefrigerator(id, userId, name, location);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Refrigerator not found' });
     }
+    await logAdminAction(req.userId, 'UPDATE_FRIDGE', `Fridge ID ${id} оновлено`);
     res.status(200).json({ message: 'Refrigerator updated successfully' });
   } catch (error) {
     console.error('Error updating refrigerator:', error.message);
@@ -57,8 +70,9 @@ const updateRefrigerator = async (req, res) => {
 // Видалення холодильника
 const deleteRefrigerator = async (req, res) => {
   const { id } = req.params;
+  const adminId = req.user?.userId;
   try {
-    const result = await refrigeratorRepository.deleteRefrigerator(id);
+    const result = await refrigeratorRepository.deleteRefrigerator(id, adminId);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Refrigerator not found' });
     }
@@ -66,7 +80,7 @@ const deleteRefrigerator = async (req, res) => {
   } catch (error) {
     console.error('Error deleting refrigerator:', error.message);
     res.status(500).json({ error: 'Failed to delete refrigerator' });
-  }  
+  }
 };
 
 const getRefrigeratorsByUser = async (req, res) => {
@@ -108,6 +122,17 @@ const getRefrigeratorLastUpdate = async (req, res) => {
     } catch (error) {
         console.error('Error fetching last update time:', error.message);
         res.status(500).json({ error: 'Failed to fetch last update time' });
+    }
+};
+
+const logAdminAction = async (adminId, action, description) => {
+    try {
+        await db.query(
+            'INSERT INTO AdminLogs (admin_id, action, description) VALUES (?, ?, ?)',
+            [adminId, action, description]
+        );
+    } catch (error) {
+        console.error('Помилка додавання логів:', error.message);
     }
 };
 
