@@ -19,16 +19,23 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 const corsOptions = {
-  origin: [
-    'https://fridge-web.onrender.com',
-    'http://localhost:4200'
-  ],
+  origin: function (origin, callback) {
+    console.log('CORS request from origin:', origin);
+    callback(null, [
+      'https://fridge-web.onrender.com',
+      'http://localhost:4200'
+    ].includes(origin));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Authorization', 'Content-Type']
 };
+app.use((req, res, next) => {
+  console.log('Request received:', req.method, req.url);
+  next();
+});
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Додаємо це для preflight!
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
