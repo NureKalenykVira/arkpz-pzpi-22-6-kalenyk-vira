@@ -5,6 +5,8 @@ console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
 console.log('DB_PORT:', process.env.DB_PORT);
 
 const express = require('express');
+const cors = require('cors');
+
 const userRoutes = require('./routes/userRoutes');
 const refrigeratorRoutes = require('./routes/refrigeratorRoutes');
 const sensorRoutes = require('./routes/sensorRoutes');
@@ -14,7 +16,16 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-const app = express();
+const app = express(); // <-- Ось тут створюєш app
+
+app.use(cors({
+  origin: [
+    'https://fridge-web.onrender.com',
+    'http://localhost:4200'
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use('/users', userRoutes);
