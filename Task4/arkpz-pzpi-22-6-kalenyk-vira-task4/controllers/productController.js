@@ -7,8 +7,8 @@ const notifyExpiration = require('../business-logic/notifyExpiration');
 const getProducts = async (req, res) => {
   try {
     const products = await productRepository.getProducts();
-    await notifyNearExpiration(products);
-    await notifyExpiration(products);
+    //await notifyNearExpiration(products);
+    //await notifyExpiration(products);
     res.status(200).json(products);
   } catch (error) {
     console.error('Error fetching products:', error.message);
@@ -33,7 +33,14 @@ const getProductById = async (req, res) => {
 
 // Додати продукт
 const addProduct = async (req, res) => {
-  const { refrigeratorId, name, category, expirationDate, rfidTag } = req.body;
+  const refrigeratorId = req.body.refrigeratorId ?? req.body.RefrigeratorID;
+  const name = req.body.name ?? req.body.Name;
+  const category = req.body.category ?? req.body.Category;
+  const expirationDate = req.body.expirationDate ?? req.body.ExpirationDate;
+  const rfidTag = req.body.rfidTag ?? req.body.RFIDTag;
+  if (!refrigeratorId || !name || !category) {
+    return res.status(400).json({ error: 'RefrigeratorID, Name, Category обов’язкові' });
+  }
   try {
     const result = await productRepository.addProduct(refrigeratorId, name, category, expirationDate, rfidTag);
     res.status(201).json({ productId: result.insertId });
@@ -47,8 +54,15 @@ const addProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { id } = req.params;
   const { name, category, expirationDate, rfidTag } = req.body;
+
+  // Припустимо, що middleware додав userId в req.user.userId
+  const userId = req.user?.userId;
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   try {
-    const result = await productRepository.updateProduct(id, name, category, expirationDate, rfidTag);
+    const result = await productRepository.updateProduct(id, name, category, expirationDate, rfidTag, userId);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
@@ -59,9 +73,9 @@ const updateProduct = async (req, res) => {
   }
 };
 
-// Видалити продукт
 const deleteProduct = async (req, res) => {
   const { id } = req.params;
+
   try {
     const result = await productRepository.deleteProduct(id);
     if (result.affectedRows === 0) {

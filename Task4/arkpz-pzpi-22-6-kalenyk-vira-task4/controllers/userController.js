@@ -27,14 +27,28 @@ const addUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, password, role } = req.body;
-  const result = await userRepository.updateUser(id, name, email, password, role);
+  const adminId = req.user?.userId;
+
+  if (!adminId) {
+    return res.status(400).json({ message: 'Admin ID is missing in token' });
+  }
+
+  const result = await userRepository.updateUser(id, name, email, password, role, adminId);
+
   if (result.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
   res.status(200).json({ message: 'User updated successfully' });
 };
 
 const deleteUser = async (req, res) => {
   const { id } = req.params;
-  const result = await userRepository.deleteUser(id);
+  const adminId = req.user?.userId;
+
+  if (!adminId) {
+    return res.status(400).json({ message: 'Admin ID is missing in token' });
+  }
+
+  const result = await userRepository.deleteUser(id, adminId);
+
   if (result.affectedRows === 0) return res.status(404).json({ error: 'User not found' });
   res.status(200).json({ message: 'User deleted successfully' });
 };

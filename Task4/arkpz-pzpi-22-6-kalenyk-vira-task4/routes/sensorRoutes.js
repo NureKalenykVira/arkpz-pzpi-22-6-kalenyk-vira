@@ -7,16 +7,16 @@ const { analyzeStorageHandler } = require('../business-logic/analyzeStorageCondi
 const checkRole = require('../middlewares/checkRole');
 const authenticateToken = require('../middlewares/authMiddleware');
 
-router.get('/analyze-storage-conditions/:sensorId', authenticateToken, checkRole(['ProductAdmin', 'LogicAdmin']), analyzeStorageHandler);
-router.post('/handle-anomalous-data', authenticateToken, checkRole(['LogicAdmin']), handleAnomalousData);
-router.get('/', authenticateToken, checkRole(['ProductAdmin']), sensorController.getSensors);
-router.get('/:id', authenticateToken, checkRole(['ProductAdmin']), sensorController.getSensorById);
-router.post('/', authenticateToken, checkRole(['ProductAdmin']), sensorController.addSensor);
-router.put('/:id', authenticateToken, checkRole(['ProductAdmin']), sensorController.updateSensor);
-router.delete('/:id', authenticateToken, checkRole(['ProductAdmin']), sensorController.deleteSensor);
-router.get('/refrigerator/:refrigeratorId', authenticateToken, checkRole(['ProductAdmin']), sensorController.getSensorsByRefrigerator);
-router.patch('/:id/status', authenticateToken, checkRole(['ProductAdmin']), sensorController.updateSensorStatus);
-router.get('/type/:type', authenticateToken, checkRole(['ProductAdmin']), sensorController.getSensorsByType);
+router.get('/analyze-storage-conditions/:sensorId', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), analyzeStorageHandler);
+router.post('/handle-anomalous-data', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), handleAnomalousData);
+router.get('/', sensorController.getSensors);
+router.get('/:id', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.getSensorById);
+router.post('/', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.addSensor);
+router.put('/:id', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.updateSensor);
+router.delete('/:id', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.deleteSensor);
+router.get('/refrigerator/:refrigeratorId', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.getSensorsByRefrigerator);
+router.patch('/:id/status', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.updateSensorStatus);
+router.get('/type/:type', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), sensorController.getSensorsByType);
 
 router.post('/data', async (req, res) => {
     console.log('Request received: POST /sensors/data');

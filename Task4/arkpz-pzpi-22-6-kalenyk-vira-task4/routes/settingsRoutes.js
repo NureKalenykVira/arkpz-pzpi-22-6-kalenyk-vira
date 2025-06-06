@@ -6,17 +6,12 @@ const {
     getIntervalHandler,
     updateIntervalHandler,
 } = require('../controllers/settingsController');
+const authenticateToken = require('../middlewares/authMiddleware');
+const checkRole = require('../middlewares/checkRole');
 
-// Маршрут для отримання порогових значень
-router.get('/thresholds', getThresholdsHandler);
-
-// Маршрут для оновлення порогових значень
-router.post('/thresholds', updateThresholdsHandler);
-
-// Маршрут для отримання частоти передачі даних
-router.get('/interval', getIntervalHandler);
-
-// Маршрут для оновлення частоти передачі даних
-router.post('/interval', updateIntervalHandler);
+router.get('/thresholds', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), getThresholdsHandler);
+router.post('/thresholds', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), updateThresholdsHandler);
+router.get('/interval', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), getIntervalHandler);
+router.post('/interval', authenticateToken, checkRole(['GlobalAdmin', 'ServiceAdmin', 'User']), updateIntervalHandler);
 
 module.exports = router;

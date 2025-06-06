@@ -6,48 +6,63 @@ const bcrypt = require('bcryptjs');
  * Логін користувача
  */
 const loginUser = async (req, res) => {
+    console.log('✅ Виконується loginUser ІЗ ТОЧНО ТАКОГО ФАЙЛУ');
+    console.log('🔥 Виконано loginUser');
     try {
         const { email, password } = req.body;
 
-        // Перевірка, чи існує користувач
         const [users] = await db.query('SELECT * FROM Users WHERE Email = ?', [email]);
         if (users.length === 0) {
             return res.status(404).json({ message: 'Користувач не знайдений.' });
         }
 
         const user = users[0];
-
-        // Перевірка пароля (припустимо, що паролі вже захешовані)
-        const bcrypt = require('bcryptjs');
         const isPasswordValid = await bcrypt.compare(password, user.Password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Неправильний пароль.' });
         }
 
-        // Генерація токена
+        // 1. Перевірка: чи вже є активний токен
+        const [existingTokens] = await db.query(
+            'SELECT Token, Expiration FROM UserTokens WHERE UserID = ? AND Expiration > NOW()',
+            [user.UserID]
+        );
+
+        if (existingTokens.length > 0) {
+            const existing = existingTokens[0];
+            return res.json({
+                message: 'Авторизація успішна (повернуто існуючий токен).',
+                token: existing.Token,
+                expiration: existing.Expiration
+            });
+        }
+
+        // 2. Генерація нового токена (1 рік)
         const token = jwt.sign(
             { userId: user.UserID, role: user.Role },
-            process.env.JWT_SECRET || 'your-secret-key',
-            { expiresIn: '2d' } // Термін дії токена
+            process.env.JWT_SECRET,
+            { expiresIn: '365d' }
         );
 
         const expiration = new Date();
-        expiration.setHours(expiration.getHours() + 1); // Термін дії токена - 1 година
+        expiration.setFullYear(expiration.getFullYear() + 1);
 
-        // Збереження токена в базу
-        await db.query(
-            'INSERT INTO UserTokens (UserID, Token, Expiration) VALUES (?, ?, ?)',
-            [user.UserID, token, expiration]
-        );
+        await db.query(`
+  INSERT INTO UserTokens (UserID, Token, Expiration)
+  VALUES (?, ?, ?)
+  ON DUPLICATE KEY UPDATE Token = VALUES(Token), Expiration = VALUES(Expiration)
+`, [user.UserID, token, expiration]);
+
 
         res.json({
-            message: 'Авторизація успішна.',
+            message: 'Авторизація успішна (згенеровано новий токен).',
             token,
-            expiration,
+            expiration
         });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Помилка при авторизації.' });
+        console.error('Помилка при авторизації:', error.message);
+        res.status(500).json({ message: 'Помилка при авторизації.', detail: error.message });
     }
 };
 
@@ -78,20 +93,22 @@ const registerUser = async (req, res) => {
         const userId = result.insertId;
 
         // Генерація токена
-        const token = jwt.sign(
-            { userId, role: role || 'RegularUser' },
-            process.env.JWT_SECRET || 'your-secret-key',
-            { expiresIn: '2d' } // Термін дії токена
-        );
+        // Генерація токена (на 1 рік)
+const token = jwt.sign(
+    { userId, role: role || 'RegularUser' },
+    process.env.JWT_SECRET,
+    { expiresIn: '365d' }
+);
 
-        const expiration = new Date();
-        expiration.setHours(expiration.getHours() + 1); // Термін дії токена - 1 година
+const expiration = new Date();
+expiration.setFullYear(expiration.getFullYear() + 1);
 
-        // Збереження токена в базу
-        await db.query(
-            'INSERT INTO UserTokens (UserID, Token, Expiration) VALUES (?, ?, ?)',
-            [userId, token, expiration]
-        );
+// Збереження токена в базу
+await db.query(`
+  INSERT INTO UserTokens (UserID, Token, Expiration)
+  VALUES (?, ?, ?)
+  ON DUPLICATE KEY UPDATE Token = VALUES(Token), Expiration = VALUES(Expiration)
+`, [userId, token, expiration]);
 
         res.status(201).json({
             message: 'Користувач успішно зареєстрований.',
